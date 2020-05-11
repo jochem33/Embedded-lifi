@@ -6,9 +6,9 @@ int minimum = 2400;
 int maximum = 0;
 int average = 500;
 
-int ledStatus = LOW;
+//int ledStatus = LOW;
 
-const long dataRate = 50000;
+const long dataRate = 4000;
 
 
 
@@ -43,18 +43,18 @@ void loop() {
     
     sensorValue = analogRead(sensorPin);
     if(sensorValue >= average){
-      if(ledStatus != HIGH){
-        ledStatus = HIGH;
-      }
+//      if(ledStatus != HIGH){
+//        ledStatus = HIGH;
+//      }
       Serial.println(1);
       
     } else {
-      if(ledStatus != LOW){
-        ledStatus = LOW;
-      }
+//      if(ledStatus != LOW){
+//        ledStatus = LOW;
+//      }
       Serial.println(0);
     }
   }
 
-  digitalWrite(ledPin, ledStatus);
+//  digitalWrite(ledPin, ledStatus);
 }
