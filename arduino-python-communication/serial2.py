@@ -50,7 +50,7 @@ while True:
         if (len(character) == 8):
             # print(characterStr.join(character), chr(int(characterStr.join(character), 2)))
             letter = chr(int(characterStr.join(character), 2))
-            print(letter)
+            # print(letter)
             text.append(letter)
             character = []
             characterStr = ""
@@ -62,6 +62,11 @@ while True:
             if(textStr[0] == "#" and textStr[-0] == "#"):
                 currentOkayCount+= 1
                 totalOkayCount+= 1
+
+                file1 = open('output.txt', 'a') 
+                file1.write(textStr) 
+                file1.close() 
+
                 print(textStr, currentOkayCount, totalOkayCount)
             else:
                 synchronize(['0', '0', '1', '0', '0', '0', '1', '1'])
