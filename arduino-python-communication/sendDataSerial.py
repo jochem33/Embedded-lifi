@@ -4,46 +4,71 @@ import serial.tools.list_ports
 from serial import Serial
 import time
 
-
-data = ["0","0","1","0","0","0","1","1",
-        "0","1","0","0","1","0","0","0",
-        "0","1","1","0","0","1","0","1",
-        "0","1","1","0","1","1","0","0",
-        "0","1","1","0","1","1","0","0",
-        "0","1","1","0","1","1","1","1",
-        "0","0","1","0","0","0","0","0",
-        "0","1","1","1","0","1","1","1",
-        "0","1","1","0","1","1","1","1",
-        "0","1","1","1","0","0","1","0",
-        "0","1","1","0","1","1","0","0",
-        "0","1","1","0","0","1","0","0",
-        "0","0","1","0","0","0","0","1",
-        "0","0","1","0","0","0","0","1",
-        "0","0","1","0","0","0","0","1",
-        "0","0","1","0","0","0","1","1"]
-
-dataLenght = len(data)
-dataIndex = 0
-
+######## const setup ######
 dataRate = 0.05
+chunkIndex = 0
+dataIndex = 0
+lineEndChar = "00100011"
+writingLine = True
+wholeLineLenght = 16 * 8
 
+###########################
+
+
+
+######## data setup ######
+print("Reading File")
+
+file1 = open('input.html', 'r') 
+fileContent = file1.read()
+file1.close()
+
+binFile = ' '.join(format(ord(x), 'b') for x in fileContent)
+binFile = binFile.replace(" ", "")
+lineLenght = 14 * 8
+
+binChucksList = [binFile[i:i+lineLenght] for i in range(0, len(binFile), lineLenght)]
+binChucksListWithLineEnd = [lineEndChar + '{0}' + lineEndChar.format(element) for element in binChucksList]
+
+print(binChucksList)
+
+binChucksListWithLineEnd = len(binFile)
+##########################
+
+
+
+######## serial setup ######
 ser = serial.Serial('/dev/cu.usbserial-14130', 115201, timeout=1)
+############################
 
-print ('\n\n\n')
 
+
+######## time setup #######
 currentTime = time.time()
 previousTime = time.time()
+############################
 
+
+print("\n\n\n ----Starting----")
 while True:
-    currentTime = time.time()
-    if(currentTime - previousTime > 0.05):
-        previousTime = currentTime
+    while writingLine == True:
+        currentTime = time.time()
+        if(currentTime - previousTime > 0.05):
+            previousTime = currentTime
 
-        currentByte = bytes(data[dataIndex], encoding='utf-8')
-        ser.write(currentByte)
-        
-        print(data[dataIndex])
-        dataIndex+= 1
-        if (dataIndex >= dataLenght):
-            dataIndex = 0
+            currentByte = bytes(binChucksListWithLineEnd[chunkIndex][dataIndex], encoding='utf-8')
+            ser.write(currentByte)
+            
+            # print(binChucksListWithLineEnd[chunkIndex][dataIndex])
+            dataIndex+= 1
+            if (dataIndex >= wholeLineLenght):
+                dataIndex = 0
+                writingLine = False
+    
+    print("\n", binChucksListWithLineEnd[chunkIndex])
+
+    writingLine = True
+    chunkIndex+= 1
+    if (chunkIndex >= dataLenght):
+        chunkIndex = 0
 
