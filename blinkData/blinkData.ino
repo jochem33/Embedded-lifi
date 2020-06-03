@@ -51,7 +51,7 @@ void loop() {
       ledState = LOW;
     }
 
-//    Serial.println(data[dataIndex]);
+    Serial.println(data[dataIndex]);
     dataIndex += 1;
     if (dataIndex >= 128) {
       dataIndex = 0;

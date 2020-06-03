@@ -16,7 +16,7 @@ unsigned long previousMicros = 0;
 
 
 void setup() {
-//  pinMode(ledPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
   Serial.begin(115200);
 
   for(int index=0; index<4000; index++)

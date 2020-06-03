@@ -7,7 +7,7 @@ from serial import Serial
 
 print ('\n\n\n')
 
-sPort = '/dev/cu.usbmodem141101'
+sPort = '/dev/cu.usbmodem141201'
 
 aSerialData = serial.Serial(sPort,115201)
 
@@ -50,7 +50,7 @@ while True:
         if (len(character) == 8):
             # print(characterStr.join(character), chr(int(characterStr.join(character), 2)))
             letter = chr(int(characterStr.join(character), 2))
-            # print(letter)
+            print(letter)
             text.append(letter)
             character = []
             characterStr = ""
