@@ -3,11 +3,13 @@ import serial
 import serial.tools.list_ports
 from serial import Serial
 
-
+file1 = open('output.txt', 'w+') 
+file1.write("") 
+file1.close() 
 
 print ('\n\n\n')
 
-sPort = '/dev/cu.usbmodem141201'
+sPort = '/dev/cu.usbmodem141101'
 
 aSerialData = serial.Serial(sPort,115201)
 
@@ -34,7 +36,7 @@ text = ["\x00"]
 
 print("Waiting for signal...\n")
 
-synchronize(['0', '0', '1', '0', '0', '0', '1', '1'])
+synchronize(['0', '1', '0', '1', '1', '1', '1', '1'])
 
 
 currentOkayCount = 0
@@ -50,7 +52,7 @@ while True:
         if (len(character) == 8):
             # print(characterStr.join(character), chr(int(characterStr.join(character), 2)))
             letter = chr(int(characterStr.join(character), 2))
-            # print(letter)
+            print(letter)
             text.append(letter)
             character = []
             characterStr = ""
@@ -58,8 +60,7 @@ while True:
         if (len(text) >= 16):
             textStr = ""
             textStr = textStr.join(text)
-            # if(textStr == "#Hello World!!##"):
-            if(textStr[0] == "#" and textStr[-0] == "#"):
+            if(textStr[0] == "_" and textStr[-0] == "_"):
                 currentOkayCount+= 1
                 totalOkayCount+= 1
 
@@ -69,7 +70,7 @@ while True:
 
                 print(textStr, currentOkayCount, totalOkayCount)
             else:
-                synchronize(['0', '0', '1', '0', '0', '0', '1', '1'])
+                synchronize(['0', '1', '0', '1', '1', '1', '1', '1'])
                 text = ["\x00"]
                 currentOkayCount = 0
             text = []

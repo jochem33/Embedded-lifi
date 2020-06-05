@@ -8,7 +8,7 @@ import time
 dataRate = 0.05
 chunkIndex = 0
 dataIndex = 0
-lineEndChar = "00100011"
+lineEndChar = "01011111"
 writingLine = True
 wholeLineLenght = 16 * 8
 
@@ -17,7 +17,7 @@ wholeLineLenght = 16 * 8
 
 
 ######## data setup ######
-print("Reading File")
+print("___________ Reading File ___________")
 
 file1 = open('input.html', 'r') 
 fileContent = file1.read()
@@ -28,17 +28,18 @@ binFile = binFile.replace(" ", "")
 lineLenght = 14 * 8
 
 binChucksList = [binFile[i:i+lineLenght] for i in range(0, len(binFile), lineLenght)]
-binChucksListWithLineEnd = [lineEndChar + '{0}' + lineEndChar.format(element) for element in binChucksList]
+# binChucksListWithLineEnd = [lineEndChar + '{0}' + lineEndChar.format(element) for element in binChucksList]
+binChucksListWithLineEnd = [lineEndChar + element + lineEndChar for element in binChucksList]
 
-print(binChucksList)
+# print(binChucksList)
 
-binChucksListWithLineEnd = len(binFile)
+dataLenght = len(binChucksListWithLineEnd)
 ##########################
 
 
 
 ######## serial setup ######
-ser = serial.Serial('/dev/cu.usbserial-14130', 115201, timeout=1)
+ser = serial.Serial('/dev/cu.usbserial-14120', 115201, timeout=1)
 ############################
 
 
@@ -49,7 +50,7 @@ previousTime = time.time()
 ############################
 
 
-print("\n\n\n ----Starting----")
+print("\n\n\n ___________ Starting ___________")
 while True:
     while writingLine == True:
         currentTime = time.time()
@@ -65,10 +66,11 @@ while True:
                 dataIndex = 0
                 writingLine = False
     
-    print("\n", binChucksListWithLineEnd[chunkIndex])
+    print("\n", lineEndChar + "_____ \n" + binChucksList[chunkIndex] + "\n _____" + lineEndChar)
 
     writingLine = True
     chunkIndex+= 1
-    if (chunkIndex >= dataLenght):
+    if (chunkIndex >= dataLenght - 1):
         chunkIndex = 0
+        print("\n___________ Restarting ___________")
 
