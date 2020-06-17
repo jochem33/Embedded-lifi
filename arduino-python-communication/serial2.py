@@ -2,8 +2,12 @@ import warnings
 import serial
 import serial.tools.list_ports
 from serial import Serial
+import webbrowser
+import os
 
-file1 = open('output.txt', 'w+') 
+filename = 'output.html'
+
+file1 = open(filename, 'w+') 
 file1.write("") 
 file1.close() 
 
@@ -48,8 +52,9 @@ synchronize(lineEndChar)
 currentOkayCount = 0
 totalOkayCount = 0
 
+receiving = True
 
-while True:
+while receiving:
     if (aSerialData.inWaiting()>0):
         sData = aSerialData.readline()
         bit = str(sData)[2]
@@ -62,7 +67,7 @@ while True:
             textStr = ""
             text.append(letter)
             textStr = textStr.join(text)
-            print(textStr)
+            # print(textStr)
             character = []
             characterStr = ""
 
@@ -74,11 +79,16 @@ while True:
                 currentOkayCount+= 1
                 totalOkayCount+= 1
 
-                file1 = open('output.txt' + "\n", 'a') 
-                file1.write(textStr) 
+                file1 = open(filename, 'a') 
+                file1.write(textStr[1:-1]) 
                 file1.close() 
 
                 print(textStr, currentOkayCount, totalOkayCount)
+                if("</html>" in textStr):
+                    print("____ END ____")
+                    receiving = False
+
+                    webbrowser.open('file://' + os.path.realpath(filename))
             else:
                 synchronize(lineEndChar)
                 text = [""]
