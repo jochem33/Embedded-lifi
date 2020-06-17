@@ -25,11 +25,13 @@ characterStr = ""
 
 
 def synchronize(syncChar):
+    os.system('cls' if os.name == 'nt' else 'clear')
     print("\n__________________________________\nSynchronizing...")
     syncList = []
     synced = False
     while synced == False:
         if (aSerialData.inWaiting()>0):
+            print(".", end="")
             sData = aSerialData.readline()
             bit = str(sData)[2]
             # print(bit)
@@ -72,9 +74,13 @@ while receiving:
             characterStr = ""
 
         if (len(text) >= 16):
+            os.system('cls' if os.name == 'nt' else 'clear')
             textStr = ""
             textStr = textStr.join(text)
-            print("_" + textStr[-0] + "__" + textStr[0] + "_")
+            if(textStr[-0] == lineEndCharChar and textStr[0] == lineEndCharChar):
+                print("✓ ", end="")
+            else:
+                print("✗ ", end="")
             if(textStr[0] == lineEndCharChar and textStr[-0] == lineEndCharChar):
                 currentOkayCount+= 1
                 totalOkayCount+= 1
@@ -83,8 +89,9 @@ while receiving:
                 file1.write(textStr[1:-1]) 
                 file1.close() 
 
-                print(textStr, currentOkayCount, totalOkayCount)
+                print(textStr[1:-1], "\n", currentOkayCount, totalOkayCount)
                 if("</html>" in textStr):
+                    os.system('cls' if os.name == 'nt' else 'clear')
                     print("____ END ____")
                     receiving = False
 
