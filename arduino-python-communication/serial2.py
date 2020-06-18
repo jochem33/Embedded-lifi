@@ -19,10 +19,17 @@ print ('\n\n\n')
 sPort = '/dev/cu.usbmodem141201'
 
 aSerialData = serial.Serial(sPort,115201)
-9
+
 character = []
 characterStr = ""
 
+firstFileLines = []
+secondFileLines = []
+
+incorrectLines = []
+# firsttransmit = True
+
+receivedChunks = {}
 
 def synchronize(syncChar):
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -44,15 +51,35 @@ def synchronize(syncChar):
                 text = []
 
 
+# def integretyCheck():
+#     incorrectLines = []
+
+#     if(firstFileLines == secondFileLines):
+#         print("integretycheck excellent")
+#         return(True, incorrectLines)
+#     else:
+#         if(len(firstFileLines) > len(secondFileLines)):
+#             shortestList = secondFileLines
+#         else:
+#             shortestList = firstFileLines
+
+#         for i in range (len(shortestList)):
+#             if not (firstFileLines[i] == secondFileLines [i]):
+#                 incorrectLines.append(i)
+#         return(False, incorrectLines)
+
+def integretyCheck(lastLineNum):
+    if(len(receivedChunks) == lastLineNum):
+        print("integretycheck excellent")
+        return(True)
+    else:
+        return(False)
+
 text = [""]
 
 print("Waiting for signal...\n")
 
 synchronize(lineEndChar)
-
-
-currentOkayCount = 0
-totalOkayCount = 0
 
 receiving = True
 
@@ -63,6 +90,7 @@ while receiving:
         character.append(bit)
 
         if (len(character) == 8):
+            os.system('cls' if os.name == 'nt' else 'clear')
             # print(characterStr.join(character), chr(int(characterStr.join(character), 2)))
             letter = chr(int(characterStr.join(character), 2))
             # print(letter)
@@ -72,34 +100,51 @@ while receiving:
             # print(textStr)
             character = []
             characterStr = ""
+            # if(firsttransmit):
+            #     print("true\n" + ''.join(firstFileLines), end="")
+            # else:
+            #     print("false\n" + ''.join(secondFileLines), end="")
+            print("".join(text).replace("¥", ""))
+            print("\n", receivedChunks.keys())
+            print("\n", receivedChunks)
+            
 
         if (len(text) >= 16):
-            os.system('cls' if os.name == 'nt' else 'clear')
             textStr = ""
             textStr = textStr.join(text)
-            if(textStr[-0] == lineEndCharChar and textStr[0] == lineEndCharChar):
-                print("✓ ", end="")
-            else:
-                print("✗ ", end="")
+
             if(textStr[0] == lineEndCharChar and textStr[-0] == lineEndCharChar):
-                currentOkayCount+= 1
-                totalOkayCount+= 1
+                lineNum = textStr[12:15]
+                try:
+                    lineNum = int(lineNum)
+                    lineValid = True
+                    print("Line valid")
+                except ValueError:
+                    print("Line invalid")
+                    lineValid = False
+                
+                if(lineValid):
+                    if not(lineNum in receivedChunks):
+                        receivedChunks[lineNum] = textStr[1:-4]
 
-                file1 = open(filename, 'a') 
-                file1.write(textStr[1:-1]) 
-                file1.close() 
+                    if("</html>" in textStr):
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        print("____ END ____")
+                        
+                        integrety = integretyCheck(lineNum)
 
-                print(textStr[1:-1], "\n", currentOkayCount, totalOkayCount)
-                if("</html>" in textStr):
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    print("____ END ____")
-                    receiving = False
+                        if(integrety):
+                            file1 = open(filename, 'a') 
+                            file1.write(''.join(''.join(receivedChunks.values()))) 
+                            file1.close() 
+                            receiving = False
 
-                    webbrowser.open('file://' + os.path.realpath(filename))
+                            webbrowser.open('file://' + os.path.realpath(filename))
+
+                    
             else:
                 synchronize(lineEndChar)
                 text = [""]
-                currentOkayCount = 0
             text = []
 
 

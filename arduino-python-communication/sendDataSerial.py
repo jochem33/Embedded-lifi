@@ -10,6 +10,7 @@ dataRate = 0.05
 chunkIndex = 0
 dataIndex = 0
 lineEndChar = "10100101"
+lineEndCharChar = "¥"
 writingLine = True
 wholeLineLenght = 16 * 8
 
@@ -24,22 +25,38 @@ file1 = open('input.txt', 'r')
 fileContent = file1.read()
 file1.close()
 
-binFile = " ".join(f"{ord(i):08b}" for i in fileContent)
+# fileContentWithLineEnd = lineEndCharChar + (lineEndCharChar * 2).join(fileContent[i:i + 11] for i in range(0, len(fileContent), 11)) + lineEndCharChar
+
+# fileContentWithLineEndAndNumber = "".join(fileContentWithLineEnd[i:i + 13]+ (3 - len(str(int(i/11)))) * "0" + str(int(i/11)) for i in range(0, len(fileContentWithLineEnd), 13))
+
+fileContentWithLineEndAndNumber = lineEndCharChar + (lineEndCharChar * 2).join(fileContent[i:i + 11]+ (3 - len(str(int(i/11)))) * "0" + str(int(i/11)) for i in range(0, len(fileContent), 11)) + lineEndCharChar
+
+
+print(fileContentWithLineEndAndNumber)
+
+binFile = "".join(f"{ord(i):08b}" for i in fileContentWithLineEndAndNumber)
 binFile = binFile.replace(" ", "")
 
 print(binFile)
-lineLenght = 14 * 8
 
-binChucksList = [binFile[i:i+lineLenght] for i in range(0, len(binFile), lineLenght)]
+binChucksListWithLineEnd = [binFile[i:i+wholeLineLenght] for i in range(0, len(binFile), wholeLineLenght)]
 
-lastLineLenght = len(binChucksList[-1])/8
-print(lastLineLenght)
-binChucksList[-1] = binChucksList[-1] + "00100000" * int(lineLenght - lastLineLenght)
+# lineLenght = 11 * 8
 
-lastLineLenght = len(binChucksList[-1])/8
-print(lastLineLenght)
+# binChucksList = [binFile[i:i+lineLenght] for i in range(0, len(binFile), lineLenght)]
 
-binChucksListWithLineEnd = [lineEndChar + element + lineEndChar for element in binChucksList]
+# lastLineLenght = len(binChucksList[-1])/8
+# print(lastLineLenght)
+# binChucksList[-1] = binChucksList[-1] + "00100000" * int(lineLenght - lastLineLenght)
+
+# lastLineLenght = len(binChucksList[-1])/8
+# print(lastLineLenght)
+
+# binChucksListWithLineEnd = []
+# for i in range (len(binChucksList)):
+#     lineNumber = (3 - len(str(i))) * "0" + str(i) 
+#     binChucksListWithLineEnd.append(lineEndChar + binChucksList[i] + lineEndChar)
+# binChucksListWithLineEnd = [lineEndChar + element + lineEndChar for element in binChucksList]
 
 dataLenght = len(binChucksListWithLineEnd)
 ##########################
@@ -74,7 +91,7 @@ while True:
                 dataIndex = 0
                 writingLine = False
     
-    print("\n", lineEndChar + "_____ \n" + binChucksList[chunkIndex] + "\n _____" + lineEndChar)
+    # print("\n", lineEndChar + "_____ \n" + binChucksList[chunkIndex] + "\n _____" + lineEndChar)
 
     writingLine = True
     chunkIndex+= 1
