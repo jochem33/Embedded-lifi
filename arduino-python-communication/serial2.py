@@ -23,11 +23,8 @@ aSerialData = serial.Serial(sPort,115201)
 character = []
 characterStr = ""
 
-firstFileLines = []
-secondFileLines = []
-
-incorrectLines = []
-# firsttransmit = True
+text = [""]
+receiving = True
 
 receivedChunks = {}
 
@@ -51,37 +48,18 @@ def synchronize(syncChar):
                 text = []
 
 
-# def integretyCheck():
-#     incorrectLines = []
-
-#     if(firstFileLines == secondFileLines):
-#         print("integretycheck excellent")
-#         return(True, incorrectLines)
-#     else:
-#         if(len(firstFileLines) > len(secondFileLines)):
-#             shortestList = secondFileLines
-#         else:
-#             shortestList = firstFileLines
-
-#         for i in range (len(shortestList)):
-#             if not (firstFileLines[i] == secondFileLines [i]):
-#                 incorrectLines.append(i)
-#         return(False, incorrectLines)
-
 def integretyCheck(lastLineNum):
-    if(len(receivedChunks) == lastLineNum):
+    if(len(receivedChunks) >= lastLineNum):
         print("integretycheck excellent")
         return(True)
     else:
         return(False)
 
-text = [""]
 
 print("Waiting for signal...\n")
 
 synchronize(lineEndChar)
 
-receiving = True
 
 while receiving:
     if (aSerialData.inWaiting()>0):
@@ -105,7 +83,7 @@ while receiving:
             # else:
             #     print("false\n" + ''.join(secondFileLines), end="")
             print("".join(text).replace("¥", ""))
-            print("\n", receivedChunks.keys())
+            print("\n", receivedChunks.keys(), len(receivedChunks.keys()))
             print("\n", receivedChunks)
             
 
@@ -118,24 +96,30 @@ while receiving:
                 try:
                     lineNum = int(lineNum)
                     lineValid = True
-                    print("Line valid")
+                    print("Line OK")
                 except ValueError:
                     print("Line invalid")
                     lineValid = False
+                    synchronize(lineEndChar)
                 
                 if(lineValid):
                     if not(lineNum in receivedChunks):
+                        print("New line")
                         receivedChunks[lineNum] = textStr[1:-4]
 
-                    if("</html>" in textStr):
+                    if("END" in textStr):
                         os.system('cls' if os.name == 'nt' else 'clear')
-                        print("____ END ____")
+                        print("____ END ____", lineNum)
                         
                         integrety = integretyCheck(lineNum)
 
                         if(integrety):
+                            finalFile = []
+                            for i in range(lineNum):
+                                # print(receivedChunks.get(i))
+                                finalFile.append(receivedChunks.get(i, ""))
                             file1 = open(filename, 'a') 
-                            file1.write(''.join(''.join(receivedChunks.values()))) 
+                            file1.write(''.join(finalFile))
                             file1.close() 
                             receiving = False
 
