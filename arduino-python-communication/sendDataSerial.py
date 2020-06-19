@@ -47,7 +47,7 @@ dataLenght = len(binChucksListWithLineEnd)
 
 
 ######## serial setup ######
-ser = serial.Serial('/dev/cu.usbserial-1420', 74880, timeout=1)
+ser = serial.Serial('/dev/cu.usbserial-1420', 115201, timeout=1)
 ############################
 
 

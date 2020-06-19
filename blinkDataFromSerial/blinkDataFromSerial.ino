@@ -29,7 +29,7 @@ const long dataRate = 50000;
 //int dataIndex = 0;
 
 void setup() {
-  Serial.begin(74880);
+  Serial.begin(115201);
   pinMode(ledPin, OUTPUT);
   pinMode(buttonPin, INPUT);
 }
@@ -38,8 +38,12 @@ void loop() {
   char inByte = Serial.read();
   if(inByte == '1') {
     ledState = HIGH;
+//    delay(2.5);
+//    ledState = LOW;
   } else if(inByte == '0'){
     ledState = LOW;
+//    delay(2.5);
+//    ledState = HIGH;
   }
 //  unsigned long currentMicros = micros();
 //

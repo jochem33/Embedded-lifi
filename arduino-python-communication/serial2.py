@@ -18,7 +18,7 @@ print ('\n\n\n')
 
 sPort = '/dev/cu.usbmodem141201'
 
-aSerialData = serial.Serial(sPort,74880)
+aSerialData = serial.Serial(sPort,115201)
 
 character = []
 characterStr = ""
@@ -28,22 +28,51 @@ receiving = True
 
 receivedChunks = {}
 
-def synchronize(syncChar):
+debugData = {"Synchronising": "NO",
+            "syncTime":0,
+            "text":"",
+            "chunkValid":"",
+            "newChunk":"NO"
+            }
+
+
+def printDebugData():
     os.system('cls' if os.name == 'nt' else 'clear')
-    print("\n__________________________________\nSynchronizing...")
+    print("Synchronising: ", debugData["Synchronising"])
+    print("syncTime: ", debugData["syncTime"])
+    print("Received chunks: (", len(receivedChunks.keys()), ") ", receivedChunks.keys())
+    print("Chunk valid: ", debugData["chunkValid"])
+    print("New chunk: ", debugData["newChunk"])
+    print("\n_________________________")
+    print("Current chunk: ", debugData["text"])
+    print("\n_________________________")
+    print(str(receivedChunks).replace(",", "\n"))
+
+
+def synchronize(syncChar):
+    debugData["Synchronising"] = "YES"
     syncList = []
     synced = False
+    syncTime = 0
     while synced == False:
         if (aSerialData.inWaiting()>0):
-            print(".", end="")
+            debugData["syncTime"] = syncTime
+            printDebugData()
+            syncTime+=1
+            # print(".", end="")
             sData = aSerialData.readline()
             bit = str(sData)[2]
             # print(bit)
             syncList.append(bit)
+            debugData["syncTime"] = syncTime
             if(syncList[-8:] == syncChar and synced == False):
-                print("Synchronized!\n__________________________________")
+                if(syncList[-16:-8] == syncChar):
+                    text = [lineEndCharChar]
+                    print("Double syncchar!!!")
+                else:
+                    text = []
+                debugData["Synchronising"] = "NO"
                 synced = True
-                text = []
 
 
 def integretyCheck(lastLineNum):
@@ -66,7 +95,6 @@ while receiving:
         character.append(bit)
 
         if (len(character) == 8):
-            os.system('cls' if os.name == 'nt' else 'clear')
             letter = chr(int(characterStr.join(character), 2))
             # print(letter)
             textStr = ""
@@ -75,9 +103,9 @@ while receiving:
             character = []
             characterStr = ""
 
-            print("".join(text).replace("¥", ""))
-            print("\n", receivedChunks.keys(), len(receivedChunks.keys()))
-            print("\n", receivedChunks)
+            debugData["text"] = "".join(text).replace("¥", "=")
+
+            printDebugData()
             
 
         if (len(text) >= 16):
@@ -89,19 +117,20 @@ while receiving:
                 try:
                     lineNum = int(lineNum)
                     lineValid = True
-                    print("Line OK")
+                    debugData["chunkValid"] = "YES"
                 except ValueError:
-                    print("Line invalid")
+                    debugData["chunkValid"] = "NO"
                     lineValid = False
                     synchronize(lineEndChar)
                 
                 if(lineValid):
                     if not(lineNum in receivedChunks):
-                        print("New line")
+                        debugData["newChunk"] = "YES"
                         receivedChunks[lineNum] = textStr[1:-4]
+                    else:
+                            debugData["newChunk"] = "NO"
 
                     if("END" in textStr):
-                        os.system('cls' if os.name == 'nt' else 'clear')
                         print("____ END ____", lineNum)
                         
                         integrety = integretyCheck(lineNum)
@@ -121,7 +150,7 @@ while receiving:
                     
             else:
                 synchronize(lineEndChar)
-                text = [""]
-            text = []
+            if not(text == [lineEndCharChar]):
+                text = []
 
 
