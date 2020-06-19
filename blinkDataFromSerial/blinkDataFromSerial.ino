@@ -68,6 +68,6 @@ void loop() {
 //    }
 //
     digitalWrite(ledPin, ledState);
-    delay(1);
+    delay(10);
 //  }
 }

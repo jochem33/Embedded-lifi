@@ -43,15 +43,15 @@ void loop() {
     
 //    sensorValue = analogRead(sensorPin);
     if(analogRead(sensorPin) >= average){
-//      if(ledStatus != HIGH){
-//        ledStatus = HIGH;
-//      }
+      if(ledStatus != HIGH){
+        ledStatus = HIGH;
+      }
       Serial.println(1);
       
     } else {
-//      if(ledStatus != LOW){
-//        ledStatus = LOW;
-//      }
+      if(ledStatus != LOW){
+        ledStatus = LOW;
+      }
       Serial.println(0);
     }
   }
