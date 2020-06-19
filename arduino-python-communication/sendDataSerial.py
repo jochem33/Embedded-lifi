@@ -41,30 +41,13 @@ print(binFile)
 
 binChucksListWithLineEnd = [binFile[i:i+wholeLineLenght] for i in range(0, len(binFile), wholeLineLenght)]
 
-# lineLenght = 11 * 8
-
-# binChucksList = [binFile[i:i+lineLenght] for i in range(0, len(binFile), lineLenght)]
-
-# lastLineLenght = len(binChucksList[-1])/8
-# print(lastLineLenght)
-# binChucksList[-1] = binChucksList[-1] + "00100000" * int(lineLenght - lastLineLenght)
-
-# lastLineLenght = len(binChucksList[-1])/8
-# print(lastLineLenght)
-
-# binChucksListWithLineEnd = []
-# for i in range (len(binChucksList)):
-#     lineNumber = (3 - len(str(i))) * "0" + str(i) 
-#     binChucksListWithLineEnd.append(lineEndChar + binChucksList[i] + lineEndChar)
-# binChucksListWithLineEnd = [lineEndChar + element + lineEndChar for element in binChucksList]
-
 dataLenght = len(binChucksListWithLineEnd)
 ##########################
 
 
 
 ######## serial setup ######
-ser = serial.Serial('/dev/cu.usbserial-1420', 115201, timeout=1)
+ser = serial.Serial('/dev/cu.usbserial-1420', 74880, timeout=1)
 ############################
 
 
@@ -91,8 +74,6 @@ while True:
                 dataIndex = 0
                 writingLine = False
     
-    # print("\n", lineEndChar + "_____ \n" + binChucksList[chunkIndex] + "\n _____" + lineEndChar)
-
     writingLine = True
     chunkIndex+= 1
     if (chunkIndex >= dataLenght - 1):

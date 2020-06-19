@@ -17,7 +17,7 @@ unsigned long previousMicros = 0;
 
 void setup() {
   pinMode(ledPin, OUTPUT);
-  Serial.begin(115200);
+  Serial.begin(74880);
 
   for(int index=0; index<4000; index++)
   {
@@ -41,17 +41,17 @@ void loop() {
   if (currentMicros - previousMicros >= dataRate) {
     previousMicros = currentMicros;
     
-    sensorValue = analogRead(sensorPin);
-    if(sensorValue >= average){
-      if(ledStatus != HIGH){
-        ledStatus = HIGH;
-      }
+//    sensorValue = analogRead(sensorPin);
+    if(analogRead(sensorPin) >= average){
+//      if(ledStatus != HIGH){
+//        ledStatus = HIGH;
+//      }
       Serial.println(1);
       
     } else {
-      if(ledStatus != LOW){
-        ledStatus = LOW;
-      }
+//      if(ledStatus != LOW){
+//        ledStatus = LOW;
+//      }
       Serial.println(0);
     }
   }

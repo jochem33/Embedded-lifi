@@ -18,7 +18,7 @@ print ('\n\n\n')
 
 sPort = '/dev/cu.usbmodem141201'
 
-aSerialData = serial.Serial(sPort,115201)
+aSerialData = serial.Serial(sPort,74880)
 
 character = []
 characterStr = ""
@@ -40,8 +40,6 @@ def synchronize(syncChar):
             bit = str(sData)[2]
             # print(bit)
             syncList.append(bit)
-            # print(syncList[-8:])
-            # if(syncList[-8:] == syncChar and syncList[-1] == syncChar and synced == False):
             if(syncList[-8:] == syncChar and synced == False):
                 print("Synchronized!\n__________________________________")
                 synced = True
@@ -69,19 +67,14 @@ while receiving:
 
         if (len(character) == 8):
             os.system('cls' if os.name == 'nt' else 'clear')
-            # print(characterStr.join(character), chr(int(characterStr.join(character), 2)))
             letter = chr(int(characterStr.join(character), 2))
             # print(letter)
             textStr = ""
             text.append(letter)
             textStr = textStr.join(text)
-            # print(textStr)
             character = []
             characterStr = ""
-            # if(firsttransmit):
-            #     print("true\n" + ''.join(firstFileLines), end="")
-            # else:
-            #     print("false\n" + ''.join(secondFileLines), end="")
+
             print("".join(text).replace("¥", ""))
             print("\n", receivedChunks.keys(), len(receivedChunks.keys()))
             print("\n", receivedChunks)
