@@ -58,20 +58,28 @@ def printDebugData():
 ######## function that looks for a syncchar in datastream ######
 def synchronize(syncChar):
     debugData["Synchronising"] = "YES"
+
+    # reset sync vars
     syncList = []
     synced = False
     syncTime = 0
+
+    #start syncing
     while synced == False:
+        #if bit is found
         if (aSerialData.inWaiting()>0):
+            # start timing
             debugData["syncTime"] = syncTime
             printDebugData()
             syncTime+=1
-            # print(".", end="")
+            debugData["syncTime"] = syncTime
+
+            #add bit to synclist
             sData = aSerialData.readline()
             bit = str(sData)[2]
-            # print(bit)
             syncList.append(bit)
-            debugData["syncTime"] = syncTime
+
+            #if synclist contains line end char, stop syncing
             if(syncList[-8:] == syncChar and synced == False):
                 if(syncList[-16:-8] == syncChar):
                     text = [LINE_END_CHAR_CHAR]
@@ -119,17 +127,22 @@ while receiving:
             #update debug data
             debugData["text"] = "".join(text).replace("¥", "=")
             printDebugData()
-        
+
+            # check if string starts with line end character
             if not(text[0] == LINE_END_CHAR_CHAR):
                 text = []
                 synchronize(LINE_END_CHAR)
 
+        # if 16 characters are received
         if (len(text) >= 16):
             textStr = ""
             textStr = textStr.join(text)
 
+            # if chunk starts and ends with the line end character
             if(textStr[0] == LINE_END_CHAR_CHAR and textStr[-0] == LINE_END_CHAR_CHAR):
                 lineNum = textStr[12:15]
+
+                # try if the last part of the chunk is a number
                 try:
                     lineNum = int(lineNum)
                     lineValid = True
@@ -139,30 +152,40 @@ while receiving:
                     lineValid = False
                     synchronize(LINE_END_CHAR)
                 
+                # if chunk is ok
                 if(lineValid):
+                    # if chunk is not yet known, add it to the list, else do nothing
                     if not(lineNum in receivedChunks):
                         debugData["newChunk"] = "YES"
                         receivedChunks[lineNum] = textStr[1:-4]
                     else:
                             debugData["newChunk"] = "NO"
 
+                    # if the end character is found in the chunk
                     if("END" in textStr):
                         print("____ END ____", lineNum)
                         
+                        #check if all lines are received
                         integrety = integretyCheck(lineNum)
 
                         if(integrety):
+                            # stick final file together
                             finalFile = []
                             for i in range(lineNum):
                                 finalFile.append(receivedChunks.get(i, ""))
+
+                            # put content in output file
                             file1 = open(FILENAME, 'a') 
                             file1.write(''.join(finalFile))
                             file1.close() 
-                            receiving = False #end main loop
 
+                            # end main loop
+                            receiving = False
+
+                            # open output in webbrowser
                             webbrowser.open('file://' + os.path.realpath(FILENAME))
 
-                    
+            # if the chunk is not correct, synchronise    
             else:
                 synchronize(LINE_END_CHAR)
             if not(text == [LINE_END_CHAR_CHAR]):
