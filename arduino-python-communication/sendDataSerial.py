@@ -5,14 +5,14 @@ from serial import Serial
 import time
 
 
-######## const setup ######
-dataRate = 0.05
+######## const and var setup ######
+DATARATE = 0.02
 chunkIndex = 0
 dataIndex = 0
-lineEndChar = "10100101"
-lineEndCharChar = "¥"
+LINE_END_CHAR = "10100101"
+LINE_END_CHAR_CHAR  = "¥"
 writingLine = True
-wholeLineLenght = 16 * 8
+WHOLE_LINE_LENGHT = 16 * 8
 
 ###########################
 
@@ -25,11 +25,7 @@ file1 = open('input.txt', 'r')
 fileContent = file1.read()
 file1.close()
 
-# fileContentWithLineEnd = lineEndCharChar + (lineEndCharChar * 2).join(fileContent[i:i + 11] for i in range(0, len(fileContent), 11)) + lineEndCharChar
-
-# fileContentWithLineEndAndNumber = "".join(fileContentWithLineEnd[i:i + 13]+ (3 - len(str(int(i/11)))) * "0" + str(int(i/11)) for i in range(0, len(fileContentWithLineEnd), 13))
-
-fileContentWithLineEndAndNumber = lineEndCharChar + (lineEndCharChar * 2).join(fileContent[i:i + 11]+ (3 - len(str(int(i/11)))) * "0" + str(int(i/11)) for i in range(0, len(fileContent), 11)) + lineEndCharChar
+fileContentWithLineEndAndNumber = LINE_END_CHAR_CHAR  + (LINE_END_CHAR_CHAR  * 2).join(fileContent[i:i + 11]+ (3 - len(str(int(i/11)))) * "0" + str(int(i/11)) for i in range(0, len(fileContent), 11)) + LINE_END_CHAR_CHAR 
 
 
 print(fileContentWithLineEndAndNumber)
@@ -39,7 +35,7 @@ binFile = binFile.replace(" ", "")
 
 print(binFile)
 
-binChucksListWithLineEnd = [binFile[i:i+wholeLineLenght] for i in range(0, len(binFile), wholeLineLenght)]
+binChucksListWithLineEnd = [binFile[i:i+WHOLE_LINE_LENGHT] for i in range(0, len(binFile), WHOLE_LINE_LENGHT)]
 
 dataLenght = len(binChucksListWithLineEnd)
 ##########################
@@ -47,7 +43,7 @@ dataLenght = len(binChucksListWithLineEnd)
 
 
 ######## serial setup ######
-ser = serial.Serial('/dev/cu.usbserial-1420', 115201, timeout=1)
+ser = serial.Serial('/dev/cu.usbserial-1410', 115201, timeout=1)
 ############################
 
 
@@ -62,7 +58,7 @@ print("\n\n\n ___________ Starting ___________")
 while True:
     while writingLine == True:
         currentTime = time.time()
-        if(currentTime - previousTime > 0.05):
+        if(currentTime - previousTime > DATARATE):
             previousTime = currentTime
 
             currentByte = bytes(binChucksListWithLineEnd[chunkIndex][dataIndex], encoding='utf-8')
@@ -70,7 +66,7 @@ while True:
             
             # print(binChucksListWithLineEnd[chunkIndex][dataIndex])
             dataIndex+= 1
-            if (dataIndex >= wholeLineLenght):
+            if (dataIndex >= WHOLE_LINE_LENGHT):
                 dataIndex = 0
                 writingLine = False
     

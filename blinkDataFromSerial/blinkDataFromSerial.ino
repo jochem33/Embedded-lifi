@@ -6,7 +6,7 @@ int ledState = LOW;
 
 unsigned long previousMicros = 0;
 
-const long dataRate = 50000;
+const long dataRate = 20000;
 
 //const int data[129] = {0,0,1,0,0,0,1,1,
 //                      0,1,0,0,1,0,0,0,

@@ -8,7 +8,7 @@ int average = 500;
 
 int ledStatus = LOW;
 
-const long dataRate = 50000;
+const long dataRate = 20000;
 
 
 

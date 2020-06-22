@@ -5,23 +5,25 @@ from serial import Serial
 import webbrowser
 import os
 
-filename = 'output.html'
 
-file1 = open(filename, 'w+') 
+######## const setup ######
+FILENAME = 'output.html'
+LINE_END_CHAR = ['1', '0', '1', '0', '0', '1', '0', '1']
+LINE_END_CHAR_CHAR = "¥"
+sPort = '/dev/cu.usbmodem14201'
+###########################
+
+
+
+######## var setup ######
+file1 = open(FILENAME, 'w+') 
 file1.write("") 
 file1.close() 
 
-lineEndChar = ['1', '0', '1', '0', '0', '1', '0', '1']
-lineEndCharChar = "¥"
-
-print ('\n\n\n')
-
-sPort = '/dev/cu.usbmodem141201'
 
 aSerialData = serial.Serial(sPort,115201)
 
 character = []
-characterStr = ""
 
 text = [""]
 receiving = True
@@ -34,8 +36,11 @@ debugData = {"Synchronising": "NO",
             "chunkValid":"",
             "newChunk":"NO"
             }
+###########################
 
 
+
+######## printing all debuging information ######
 def printDebugData():
     os.system('cls' if os.name == 'nt' else 'clear')
     print("Synchronising: ", debugData["Synchronising"])
@@ -47,8 +52,10 @@ def printDebugData():
     print("Current chunk: ", debugData["text"])
     print("\n_________________________")
     print(str(receivedChunks).replace(",", "\n"))
+###########################
 
 
+######## function that looks for a syncchar in datastream ######
 def synchronize(syncChar):
     debugData["Synchronising"] = "YES"
     syncList = []
@@ -67,52 +74,61 @@ def synchronize(syncChar):
             debugData["syncTime"] = syncTime
             if(syncList[-8:] == syncChar and synced == False):
                 if(syncList[-16:-8] == syncChar):
-                    text = [lineEndCharChar]
+                    text = [LINE_END_CHAR_CHAR]
                     print("Double syncchar!!!")
                 else:
                     text = []
                 debugData["Synchronising"] = "NO"
                 synced = True
+###########################
 
 
+######## function that checks if all chunks came in ######
 def integretyCheck(lastLineNum):
     if(len(receivedChunks) >= lastLineNum):
         print("integretycheck excellent")
         return(True)
     else:
         return(False)
+###########################
 
 
+
+# first synchronisation
 print("Waiting for signal...\n")
+synchronize(LINE_END_CHAR)
 
-synchronize(lineEndChar)
 
-
+# main loop
 while receiving:
+    # if serial data is found
     if (aSerialData.inWaiting()>0):
+
+        # get bits and put them in character list
         sData = aSerialData.readline()
         bit = str(sData)[2]
         character.append(bit)
 
+        # if 8 bits in character list
         if (len(character) == 8):
-            letter = chr(int(characterStr.join(character), 2))
-            # print(letter)
-            textStr = ""
+            #convert from binary to letter
+            letter = chr(int("".join(character), 2))
             text.append(letter)
-            textStr = textStr.join(text)
             character = []
-            characterStr = ""
 
+            #update debug data
             debugData["text"] = "".join(text).replace("¥", "=")
-
             printDebugData()
-            
+        
+            if not(text[0] == LINE_END_CHAR_CHAR):
+                text = []
+                synchronize(LINE_END_CHAR)
 
         if (len(text) >= 16):
             textStr = ""
             textStr = textStr.join(text)
 
-            if(textStr[0] == lineEndCharChar and textStr[-0] == lineEndCharChar):
+            if(textStr[0] == LINE_END_CHAR_CHAR and textStr[-0] == LINE_END_CHAR_CHAR):
                 lineNum = textStr[12:15]
                 try:
                     lineNum = int(lineNum)
@@ -121,7 +137,7 @@ while receiving:
                 except ValueError:
                     debugData["chunkValid"] = "NO"
                     lineValid = False
-                    synchronize(lineEndChar)
+                    synchronize(LINE_END_CHAR)
                 
                 if(lineValid):
                     if not(lineNum in receivedChunks):
@@ -138,19 +154,18 @@ while receiving:
                         if(integrety):
                             finalFile = []
                             for i in range(lineNum):
-                                # print(receivedChunks.get(i))
                                 finalFile.append(receivedChunks.get(i, ""))
-                            file1 = open(filename, 'a') 
+                            file1 = open(FILENAME, 'a') 
                             file1.write(''.join(finalFile))
                             file1.close() 
-                            receiving = False
+                            receiving = False #end main loop
 
-                            webbrowser.open('file://' + os.path.realpath(filename))
+                            webbrowser.open('file://' + os.path.realpath(FILENAME))
 
                     
             else:
-                synchronize(lineEndChar)
-            if not(text == [lineEndCharChar]):
+                synchronize(LINE_END_CHAR)
+            if not(text == [LINE_END_CHAR_CHAR]):
                 text = []
 
 

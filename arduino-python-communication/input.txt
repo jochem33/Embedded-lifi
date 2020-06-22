@@ -4,13 +4,9 @@
         <title>Testsite</title>
     </head>
     <body>
-        <div style="color: white; background-color: red;">
-            <h1>Heading</h1>
-            <p>Hello World!</p>
-        </div>
         <div style="color: white; background-color: green;">
             <h1>LiFi</h1>
-            <p>Wow! This site was sent over light! Not yet light speed but pretty close. <a href="https://github.com/jochem33/Embedded-lifi">Learn more</a></p>
+            <p>This site was sent over light!<a href="https://github.com/jochem33/Embedded-lifi">Learn more</a></p>
         </div>
     </body>
 </html>
